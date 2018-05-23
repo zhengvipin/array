@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<table border="1">
+    <thead>
+    <tr>
+        <th><input type="checkbox"></th>
+        <th>序号</th>
+        <th>姓名</th>
+        <th>密码</th>
+        <th>状态</th>
+    </tr>
+    </thead>
+    <!-- 动态数据 --->
+    <tbody></tbody>
+    <!-- 动态数据 --->
+</table>
+<button type="button" onclick="removeBatch()">删除数据</button>
+<button type="button" onclick="recoveryBatch()">恢复数据</button>
+<script src="jquery.2.1.4.min.js"></script>
+<script>
+    /**
+     * 加载初始化数据
+     */
+    $(window).on('load', () => {
+        $.ajax({
+            url: '/emp/findAll',
+            type: 'get',
+            dataType: 'json',
+            success: (data) => {
+                //console.log(data);
+                let text = ``;
+                $.each(data, (i, item) => {
+                    text += `
+                        <tr id="${item.id}">
+                            <td><input type="checkbox"></td>
+                            <td>${i + 1}</td>
+                            <td>${item.username}</td>
+                            <td>${item.password}</td>
+                            <td>${item.state}</td>
+                        </tr>
+                    `;
+                });
+                $('tbody').append(text);
+            }
+        })
+    });
+
+    /**
+     * 删除数据
+     */
+    function removeBatch() {
+        // 数组传值问题
+        // 1
+        let arr1 = [1, 2, 3, 4, 5];
+        console.log("-----------arr1----------");
+        console.log(arr1); // [1, 2, 3, 4, 5]
+        // 2
+        let arr2 = [];
+        arr2.push(1);
+        arr2.push(2);
+        arr2.push(3);
+        arr2.push(4);
+        arr2.push(5);
+        console.log("-----------arr2----------");
+        console.log(arr2); // [1, 2, 3, 4, 5]
+        console.log(arr2.join(',')); // 1, 2, 3, 4, 5
+        // 3
+        let arr3 = '1,2,3,4,5';
+        console.log("-----------arr3----------");
+        console.log(arr3); // 1, 2, 3, 4, 5
+
+        $.ajax({
+            url: '/emp/removeBatch',
+            type: 'post',
+            data: {id: arr3},
+            dataType: 'json',
+            success: (data) => {
+                if(data.code === 400){
+                    alert(data.message);
+                    return;
+                }
+                location.reload();
+            }
+        })
+    }
+
+    /**
+     * 恢复数据
+     */
+    function recoveryBatch() {
+        $.ajax({
+            url: '/emp/recoveryBatch',
+            type: 'post',
+            data: {id: '1,2,3,4,5'},
+            dataType: 'json',
+            success: (data) => {
+                if(data.code === 400){
+                    alert(data.message);
+                    return;
+                }
+                location.reload();
+            }
+        })
+    }
+</script>
+</body>
+</html>
